@@ -45,6 +45,7 @@ async function getFeaturedRooms(): Promise<Room[]> {
   ];
 }
 
+
 export default async function Home() {
   const featuredRooms = await getFeaturedRooms();
 
