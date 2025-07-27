@@ -1,7 +1,7 @@
 
+import UserModel from '@/models/user.model';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
-import UserModel from './user';
 
 
 const userSchema = z.object({

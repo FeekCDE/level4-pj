@@ -3,10 +3,10 @@ export interface User {
   name: string;
   email: string;
   password?: string;             // Only for client-side forms (never stored in state)
-  avatar?: string;              // URL to profile image (Cloudinary)
+  // avatar?: string;              // URL to profile image (Cloudinary)
   role: 'user' | 'admin';       // User permissions
-  bookings: BookingRef[];       // Array of booking references
-  favorites: string[];          // Array of room IDs
+  // bookings: BookingRef[];       // Array of booking references
+  // favorites: string[];          // Array of room IDs
   createdAt: Date;
   updatedAt: Date;
 }

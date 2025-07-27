@@ -3,7 +3,7 @@
 import { useActionState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { handleLogIn } from '../lib/authentication';
+import { handleLogIn } from '../../authentication';
 
 const initialState = {
   success: false,
@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (state.success) {
-      router.push("/profile");
+      router.push("/");
     }
   }, [state.success, router]);
 
@@ -94,7 +94,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-8 text-center text-sm text-amber-700">
-            <p className="mb-2">Don't have an account?</p>
+            <p className="mb-2">Don&#39;t have an account?</p>
             <Link 
               href="/signup" 
               className="font-medium text-amber-600 hover:text-amber-800 underline underline-offset-4 transition-colors"

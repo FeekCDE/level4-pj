@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import { ENV } from "@/util";
-import UserModel from "./user";
+import UserModel from "@/models/user.model";
 
 
 export const verifyUser = async () => {

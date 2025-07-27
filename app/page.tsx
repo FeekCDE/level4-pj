@@ -18,7 +18,8 @@ async function getFeaturedRooms(): Promise<Room[]> {
       description: "",
       capacity: 0,
       beds: 0,
-      roomSize: ""
+      roomSize: "",
+      status: ""
     },
     {
       _id: "2",
@@ -29,7 +30,8 @@ async function getFeaturedRooms(): Promise<Room[]> {
       description: "",
       capacity: 0,
       beds: 0,
-      roomSize: ""
+      roomSize: "",
+      status: ""
     },
     {
       _id: "3",
@@ -40,7 +42,8 @@ async function getFeaturedRooms(): Promise<Room[]> {
       description: "",
       capacity: 0,
       beds: 0,
-      roomSize: ""
+      roomSize: "",
+      status: ""
     },
   ];
 }

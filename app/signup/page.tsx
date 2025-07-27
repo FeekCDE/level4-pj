@@ -3,7 +3,7 @@
 import { useActionState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { handleSignUp } from "../lib/authentication";
+import { handleSignUp } from "../../authentication";
 
 const initialState = {
   success: false,

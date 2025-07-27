@@ -1,10 +1,22 @@
-"use client"
+"use client";
 
-import Link from 'next/link';
 import { useAuth } from '@/authContext';
+import Link from 'next/link';
+
 
 export default function Navbar() {
-  const { user, isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, user, logout, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <nav className="bg-white shadow-lg">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="animate-pulse h-8 w-32 bg-gray-200 rounded"></div>
+          <div className="animate-pulse h-8 w-32 bg-gray-200 rounded"></div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="bg-white shadow-lg">
@@ -19,24 +31,31 @@ export default function Navbar() {
           <Link href="/search" className="hover:text-amber-600 transition">
             Browse
           </Link>
-          <Link href="/dashboard" className="hover:text-amber-600 transition">
-            Dashboard
-          </Link>
-          {isLoggedIn ? (
-            <Link href="/bookings" className="hover:text-amber-600 transition">
-              My Bookings
-            </Link>
-          ) : null}
+          {isLoggedIn && (
+            <>
+              <Link href="/dashboard" className="hover:text-amber-600 transition">
+                Dashboard
+              </Link>
+              <Link href="/bookings" className="hover:text-amber-600 transition">
+                My Bookings
+              </Link>
+              {user?.role === 'admin' && (
+                <Link href="/admin" className="hover:text-amber-600 transition">
+                  Admin
+                </Link>
+              )}
+            </>
+          )}
         </div>
 
         {/* Auth Buttons */}
         <div className="flex items-center space-x-4">
           {isLoggedIn ? (
             <div className="flex items-center space-x-3">
-              <span className="text-sm">Hi, {user?.name}</span>
+              <span className="text-sm">Hi, {user?.firstName}</span>
               <button
                 onClick={logout}
-                className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm"
+                className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
               >
                 Logout
               </button>
@@ -45,13 +64,13 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="text-sm hover:text-amber-600 transition"
+                className="text-sm hover:text-amber-600 transition-colors"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm"
+                className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
               >
                 Sign Up
               </Link>

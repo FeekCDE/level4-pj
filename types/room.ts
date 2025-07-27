@@ -1,23 +1,24 @@
 // types/room.d.ts
 export interface Room {
-  _id: string;               // MongoDB ID
+  _id: string;
   name: string;
-  description: string;       // Detailed room description
+  description: string;
   price: number;
-  image: string;             // URL or path (Cloudinary/public)
-  images?: string[];         // Additional images
-  amenities: Amenity[];      // Specific amenities
-  capacity: number;          // Max guests
+  image: string;
+  images?: string[];
+  amenities: Amenity[];
+  capacity: number;
   beds: number;
-  roomSize: string;          // e.g., "450 sq ft"
-  isFeatured?: boolean;      // For homepage display
-  rating?: number;           // 1-5
-  reviews?: Review[];        // User reviews
-  available?: boolean;       // Booking status
+  roomSize: string;
+  isFeatured?: boolean;
+  rating?: number;
+  reviews?: Review[];
+  status: Status[]|string;
 }
 
-// Supporting types
-export type Amenity = 
+export type Status = "available" | "occupied" | "maintainance" | string;
+
+export type Amenity =
   | "WiFi"
   | "Pool"
   | "Gym"
@@ -28,10 +29,10 @@ export type Amenity =
   | "Kitchen"
   | "Parking"
   | "Balcony"
-  | string;                  // Allows custom amenities
+  | string;
 
 export interface Review {
-  userId: string;            // Reference to User
+  userId: string;
   userName: string;
   rating: number;
   comment: string;

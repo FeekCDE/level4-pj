@@ -8,9 +8,9 @@ const Hero = () => {
         <section className="relative h-[600px]">
         <div className="absolute inset-0 bg-black/50 z-10" />
         <Image
-          src="/images/hero-bg.jpg"
+          src="/images/herobg.webp"
           alt="Luxury hotel"
-          fill
+          layout="fill"
           className="object-cover"
           priority
         />
