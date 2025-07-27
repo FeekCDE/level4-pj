@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import { Room } from '@/types/room';
+import { useState } from "react";
+import { Room } from "@/types/room";
 
 interface AddRoomModalProps {
   isOpen: boolean;
@@ -9,45 +9,82 @@ interface AddRoomModalProps {
   onSave: (room: Room) => Promise<void>;
 }
 
-const defaultRoomData: Omit<Room, '_id'> = {
-  name: '',
-  description: '',
+const defaultRoomData: Omit<Room, "_id"> = {
+  name: "",
+  description: "",
   price: 0,
   capacity: 1,
   beds: 1,
   amenities: [],
-  roomSize: '',
-  image: '',
-  status: 'available',
+  roomSize: "",
+  images: [],
+  status: "available"
 };
 
 export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalProps) {
-  const [roomData, setRoomData] = useState<Omit<Room, '_id'>>(defaultRoomData);
+  const [roomData, setRoomData] = useState<Omit<Room, "_id">>(defaultRoomData);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
-  const amenitiesOptions: Room['amenities'][number][] = [
-    'WiFi',
-    'Pool',
-    'Gym',
-    'Breakfast',
-    'Air Conditioning',
-    'TV',
-    'Workspace',
+  const amenitiesOptions: Room["amenities"][number][] = [
+    "WiFi",
+    "Pool",
+    "Gym",
+    "Breakfast",
+    "Air Conditioning",
+    "TV",
+    "Workspace",
   ];
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setUploadingImage(true);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Image upload failed");
+      }
+
+      setRoomData((prev) => ({
+        ...prev,
+        image: data.url,
+      }));
+    } catch (err) {
+      console.error("Image upload failed:", err);
+      setFormError("Failed to upload image. Please try again.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setFormError(null); // clear previous error
 
     try {
       await onSave({
         ...roomData,
-        _id: '', // temp placeholder if backend assigns this
+        _id: undefined
       });
       setRoomData(defaultRoomData);
       onClose();
-    } catch (error) {
-      console.error('Error saving room:', error);
+    } catch (error: any) {
+      console.error("Error saving room:", error);
+      setFormError(error?.message || "Failed to save room. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -65,70 +102,74 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
   if (!isOpen) return null;
 
   return (
-    <div className="inset-0 bg-amber-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-amber-800">Add New Room</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              ✕
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {formError && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm">
+                {formError}
+              </div>
+            )}
+
+            {/* Room Name */}
             <div>
               <label className="block text-sm font-medium text-amber-700 mb-1">Room Name</label>
               <input
                 type="text"
                 value={roomData.name}
                 onChange={(e) => setRoomData({ ...roomData, name: e.target.value })}
-                className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+                className="w-full px-4 py-2 border border-amber-300 rounded-lg"
                 required
               />
             </div>
 
+            {/* Description */}
             <div>
               <label className="block text-sm font-medium text-amber-700 mb-1">Description</label>
               <textarea
                 value={roomData.description}
                 onChange={(e) => setRoomData({ ...roomData, description: e.target.value })}
-                className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+                className="w-full px-4 py-2 border border-amber-300 rounded-lg"
                 rows={3}
                 required
               />
             </div>
 
+            {/* Price & Capacity */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-amber-700 mb-1">Price ($)</label>
+                <label className="block text-sm font-medium text-amber-700 mb-1">Price (₦)</label>
                 <input
                   type="number"
                   value={roomData.price}
                   onChange={(e) => setRoomData({ ...roomData, price: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+                  className="w-full px-4 py-2 border border-amber-300 rounded-lg"
                   min="0"
                   required
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-amber-700 mb-1">Capacity</label>
                 <input
                   type="number"
                   value={roomData.capacity}
                   onChange={(e) => setRoomData({ ...roomData, capacity: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+                  className="w-full px-4 py-2 border border-amber-300 rounded-lg"
                   min="1"
                   required
                 />
               </div>
             </div>
 
+            {/* Beds & Room Size */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-amber-700 mb-1">Beds</label>
@@ -136,36 +177,43 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
                   type="number"
                   value={roomData.beds}
                   onChange={(e) => setRoomData({ ...roomData, beds: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+                  className="w-full px-4 py-2 border border-amber-300 rounded-lg"
                   min="1"
                   required
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-amber-700 mb-1">Room Size (sq ft)</label>
                 <input
                   type="text"
                   value={roomData.roomSize}
                   onChange={(e) => setRoomData({ ...roomData, roomSize: e.target.value })}
-                  className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+                  className="w-full px-4 py-2 border border-amber-300 rounded-lg"
                   required
                 />
               </div>
             </div>
 
+            {/* Image Upload */}
             <div>
-              <label className="block text-sm font-medium text-amber-700 mb-1">Image URL</label>
+              <label className="block text-sm font-medium text-amber-700 mb-1">Upload Image</label>
               <input
-                type="text"
-                value={roomData.image}
-                onChange={(e) => setRoomData({ ...roomData, image: e.target.value })}
-                className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
-                placeholder="https://example.com/room.jpg"
-                required
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="w-full px-4 py-2 border border-amber-300 rounded-lg"
               />
+              {uploadingImage && <p className="text-xs text-gray-500 mt-1">Uploading...</p>}
+              {roomData.images && (
+                <img
+                  src={roomData.images[0]}
+                  alt="Preview"
+                  className="mt-2 w-full h-40 object-cover rounded-lg"
+                />
+              )}
             </div>
 
+            {/* Amenities */}
             <div>
               <label className="block text-sm font-medium text-amber-700 mb-1">Amenities</label>
               <div className="grid grid-cols-2 gap-2">
@@ -175,7 +223,7 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
                       type="checkbox"
                       checked={roomData.amenities.includes(amenity)}
                       onChange={() => toggleAmenity(amenity)}
-                      className="h-4 w-4 text-amber-600 rounded border-amber-300 focus:ring-amber-500"
+                      className="h-4 w-4 text-amber-600 rounded"
                     />
                     <span className="text-sm text-gray-700">{amenity}</span>
                   </label>
@@ -183,12 +231,15 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
               </div>
             </div>
 
+            {/* Status */}
             <div>
               <label className="block text-sm font-medium text-amber-700 mb-1">Status</label>
               <select
                 value={roomData.status}
-                onChange={(e) => setRoomData({ ...roomData, status: e.target.value as Room['status'] })}
-                className="w-full px-4 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+                onChange={(e) =>
+                  setRoomData({ ...roomData, status: e.target.value as Room["status"] })
+                }
+                className="w-full px-4 py-2 border border-amber-300 rounded-lg"
               >
                 <option value="available">Available</option>
                 <option value="occupied">Occupied</option>
@@ -196,6 +247,7 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
               </select>
             </div>
 
+            {/* Actions */}
             <div className="flex justify-end space-x-3 pt-4">
               <button
                 type="button"
@@ -206,12 +258,14 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
               </button>
               <button
                 type="submit"
-                disabled={isLoading}
-                className={`px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:from-amber-600 hover:to-amber-700 ${
-                  isLoading ? 'opacity-70 cursor-not-allowed' : ''
+                disabled={isLoading || uploadingImage}
+                className={`px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg ${
+                  isLoading || uploadingImage
+                    ? "opacity-60 cursor-not-allowed"
+                    : "hover:from-amber-600 hover:to-amber-700"
                 }`}
               >
-                {isLoading ? 'Saving...' : 'Save Room'}
+                {isLoading ? "Saving..." : "Save Room"}
               </button>
             </div>
           </form>

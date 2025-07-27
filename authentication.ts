@@ -111,13 +111,12 @@ export async function handleSignUp(prevState: FormState | null, formData: FormDa
 export async function handleLogIn(prevState: FormState | null, formData: FormData): Promise<FormState> {
   try {
     await dbConnect();
-    
+
     const credentials: LoginCredentials = {
-      email: formData.get('email')?.toString() || '',
+      email: formData.get('email')?.toString().toLowerCase().trim() || '',
       password: formData.get('password')?.toString() || '',
     };
 
-    // Find user with password field
     const user = await UserModel.findOne({ email: credentials.email }).select('+password');
     if (!user) {
       return {
@@ -126,7 +125,6 @@ export async function handleLogIn(prevState: FormState | null, formData: FormDat
       };
     }
 
-    // Verify password
     const isMatch = await bcrypt.compare(credentials.password, user.password);
     if (!isMatch) {
       return {
@@ -135,33 +133,30 @@ export async function handleLogIn(prevState: FormState | null, formData: FormDat
       };
     }
 
-    // Generate JWT token
     const token = jwt.sign(
-      { 
-        id: user._id, 
+      {
+        id: user._id,
         role: user.role,
         firstName: user.firstName,
-        lastName: user.lastName
+        lastName: user.lastName,
       },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
     );
 
-    // Set secure HTTP-only cookie
-    (await
-      // Set secure HTTP-only cookie
-      cookies()).set('token', token, {
+    const cookieStore = await cookies();
+    cookieStore.set('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
       path: '/',
-      sameSite: 'strict'
+      sameSite: 'strict',
     });
 
     return {
       success: true,
       message: 'Login successful',
-      token
+      token,
     };
 
   } catch (error) {
@@ -175,13 +170,15 @@ export async function handleLogIn(prevState: FormState | null, formData: FormDat
 
 export async function handleLogOut() {
   (await cookies()).delete('token');
-  redirect('/login');
+  redirect('/');
 }
 
 export async function getCurrentUser() {
   try {
     await dbConnect();
-    const token = (await cookies()).get('token')?.value;
+
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     if (!token) return null;
 
     const decoded = jwt.verify(token, JWT_SECRET) as {

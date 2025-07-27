@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-// import { useAuth } from '@/context/AuthContext';
-import {useAuth} from '@/authContext'
+import { useAuth } from '@/authContext';
 import type { Room } from '@/types/room';
 import SearchFilters from '../components/ui/SearchFilters';
 import RoomCard from '../components/ui/RoomCard';
@@ -17,27 +16,42 @@ export default function BrowsePage() {
     maxPrice: 1000,
     amenities: [] as string[],
   });
+
   const { isLoggedIn } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        setLoading(true);
-        // In a real app, you would fetch from your API with filters
-        const response = await fetch('/api/rooms');
-        const data = await response.json();
-        setRooms(data);
-      } catch (err) {
-        setError('Failed to load rooms. Please try again later.');
-        console.error('Fetch error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const timeout = setTimeout(() => {
+      const fetchRooms = async () => {
+        try {
+          setLoading(true);
 
-    fetchRooms();
-  }, [filters]); // Re-fetch when filters change
+          const query = new URLSearchParams();
+          if (filters.minPrice) query.append('minPrice', filters.minPrice.toString());
+          if (filters.maxPrice) query.append('maxPrice', filters.maxPrice.toString());
+          filters.amenities.forEach(amenity => query.append('amenities', amenity));
+
+          const response = await fetch(`/api/rooms?${query.toString()}`);
+          const result = await response.json();
+
+          if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Failed to fetch rooms');
+          }
+
+          setRooms(result.data);
+        } catch (err) {
+          setError('Failed to load rooms. Please try again later.');
+          console.error('Fetch error:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchRooms();
+    }, 500); // debounce delay
+
+    return () => clearTimeout(timeout);
+  }, [filters]);
 
   const handleBookNow = (roomId: string) => {
     if (!isLoggedIn) {

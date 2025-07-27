@@ -1,6 +1,6 @@
 import { authMiddleware } from '@/authentication';
 import dbConnect from '@/dbConnect';
-import roomModel from '@/models/room.model';
+import Room from '@/models/room.model';
 import { NextResponse } from 'next/server';
 
 
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
       if (maxPrice) query.price.$lte = Number(maxPrice);
     }
 
-    const rooms = await roomModel.find(query);
+    const rooms = await Room.find(query);
     return NextResponse.json({ success: true, data: rooms }, { status: 200 });
   } catch (error) {
     console.error(error);
@@ -51,7 +51,7 @@ export const POST = async (request: Request) => {
       await dbConnect();
 
       const roomData = await request.json();
-      const newRoom = await roomModel.create(roomData);
+      const newRoom = await Room.create(roomData);
 
       return NextResponse.json({ success: true, data: newRoom }, {
         status: 201,

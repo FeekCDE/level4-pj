@@ -1,22 +1,15 @@
-"use client";
-
-import { useAuth } from '@/authContext';
+import { handleLogOut } from '@/authentication';
 import Link from 'next/link';
 
+interface NavbarProps {
+  user: {
+    firstName: string;
+    role: string;
+  } | null;
+}
 
-export default function Navbar() {
-  const { isLoggedIn, user, logout, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <nav className="bg-white shadow-lg">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="animate-pulse h-8 w-32 bg-gray-200 rounded"></div>
-          <div className="animate-pulse h-8 w-32 bg-gray-200 rounded"></div>
-        </div>
-      </nav>
-    );
-  }
+export default function Navbar({ user }: NavbarProps) {
+  const isLoggedIn = !!user;
 
   return (
     <nav className="bg-white shadow-lg">
@@ -52,13 +45,16 @@ export default function Navbar() {
         <div className="flex items-center space-x-4">
           {isLoggedIn ? (
             <div className="flex items-center space-x-3">
-              <span className="text-sm">Hi, {user?.firstName}</span>
-              <button
-                onClick={logout}
-                className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
-              >
-                Logout
-              </button>
+              <span className="text-sm">Hi, {user.firstName}</span>
+              {/* You could implement logout via a POST server action or redirect */}
+              <form action={handleLogOut} method="POST">
+                <button
+                  type="submit"
+                  className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+                >
+                  Logout
+                </button>
+              </form>
             </div>
           ) : (
             <>

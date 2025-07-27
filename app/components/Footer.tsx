@@ -39,10 +39,10 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Contact</h4>
             <address className="not-italic text-gray-300">
-              <p>123 Luxury Avenue</p>
-              <p>Miami, FL 33101</p>
+              <p>123 Adedokun Avenue</p>
+              <p>OgoOluwa, Osogbo</p>
               <p>reservations@luxurystays.com</p>
-              <p>+1 (555) 123-4567</p>
+              <p>+234 80 123-4567 788</p>
             </address>
           </div>
 

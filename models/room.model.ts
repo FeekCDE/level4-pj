@@ -107,5 +107,5 @@ RoomSchema.index({
   amenities: 'text',
 });
 
-
-export default mongoose.model<IRoom>('Room', RoomSchema);
+const Room = mongoose.models.Room || mongoose.model<IRoom>('Room', RoomSchema);
+export default Room;

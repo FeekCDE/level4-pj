@@ -27,21 +27,23 @@ export default function ManageRooms() {
     fetchRooms();
   }, []);
 
-  const handleAddRoom = async (newRoom: Room) => {
-    try {
-      const res = await fetch('/api/admin/rooms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newRoom),
-      });
-      if (!res.ok) throw new Error('Failed to add room');
-      const addedRoom: Room = await res.json();
-      setRooms([...rooms, addedRoom]);
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error('Error adding room:', error);
-    }
-  };
+ const handleAddRoom = async (room: Room) => {
+  try {
+    const res = await fetch('/api/rooms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(room),
+    });
+
+    if (!res.ok) throw new Error('Failed to create room');
+
+    const savedRoom = await res.json();
+  } catch (err) {
+    console.error('Create room error:', err);
+  }
+};
 
   return (
     <div className="space-y-6">

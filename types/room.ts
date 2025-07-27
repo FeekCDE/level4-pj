@@ -1,10 +1,9 @@
 // types/room.d.ts
 export interface Room {
-  _id: string;
+  _id: Key | null | undefined;
   name: string;
   description: string;
   price: number;
-  image: string;
   images?: string[];
   amenities: Amenity[];
   capacity: number;

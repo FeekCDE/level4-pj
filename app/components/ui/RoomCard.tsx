@@ -12,7 +12,7 @@ export default function RoomCard({ room, onBookNow, isLoggedIn }: RoomCardProps)
     <div className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative h-48">
         <Image
-          src={room.image}
+          src={room.images && room.images.length > 0 ? room.images[0] : '/placeholder.jpg'}
           alt={room.name}
           fill
           className="object-cover"
