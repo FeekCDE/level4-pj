@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Room } from "@/types/room";
+import Image from "next/image";
 
 interface AddRoomModalProps {
   isOpen: boolean;
@@ -76,9 +77,10 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
       await onSave(roomData);
       setRoomData(defaultRoomData);
       onClose();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error saving room:", error);
-      setFormError(error?.message || "Failed to save room. Please try again.");
+      const errMsg = error instanceof Error ? error.message : "Failed to save room. Please try again.";
+      setFormError(errMsg);
     } finally {
       setIsLoading(false);
     }
@@ -199,7 +201,7 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
               />
               {uploadingImage && <p className="text-xs text-gray-500 mt-1">Uploading...</p>}
               {((roomData.images?.length ?? 0) > 0) && (
-                <img
+                <Image
                   src={roomData.images?.[0] || ""}
                   alt="Preview"
                   className="mt-2 w-full h-40 object-cover rounded-lg"
