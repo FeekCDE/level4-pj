@@ -7,7 +7,7 @@ import Image from "next/image";
 interface AddRoomModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (room: Omit<Room, "_id">) => Promise<void>; // ✅ updated to not expect _id
+  onSave: (room: Omit<Room, "_id">) => Promise<void>;
 }
 
 const defaultRoomData: Omit<Room, "_id"> = {

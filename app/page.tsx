@@ -4,12 +4,13 @@ import Hero from "./components/Hero";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { getCurrentUser } from "@/authentication";
-import Room from "@/models/room.model";
-import { IRoom } from "@/models/room.model";
+import Room, { IRoom } from "@/models/room.model";
 import dbConnect from "@/dbConnect";
 
+export const dynamic = "force-dynamic";
+
 async function getFeaturedRooms(): Promise<IRoom[]> {
-  dbConnect();
+  await dbConnect(); 
   return Room.find({ isFeatured: true }).limit(6).exec();
 }
 
@@ -70,7 +71,7 @@ export default async function Home() {
             >
               <div className="relative h-64">
                 <Image
-                  src={room.images[0]} 
+                  src={room.images[0]}
                   alt={room.name}
                   fill
                   className="object-cover"
@@ -106,6 +107,7 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* CTA Section */}
       <section className="bg-amber-50 py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready for an unforgettable stay?</h2>
