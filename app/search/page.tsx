@@ -107,7 +107,7 @@ export default function BrowsePage() {
           {rooms.length === 0 ? (
             <div className="text-center py-12">
               <h3 className="text-xl font-medium text-gray-700 mb-2">
-                No rooms match your filters
+                No rooms match your filter
               </h3>
               <p className="text-gray-500">
                 Try adjusting your search criteria
