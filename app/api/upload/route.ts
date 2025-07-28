@@ -1,3 +1,4 @@
+import dbConnect from '@/dbConnect';
 import { v2 as cloudinary } from 'cloudinary';
 import { NextResponse } from 'next/server';
 
@@ -8,6 +9,7 @@ cloudinary.config({
 });
 
 export const POST = async (req: Request) => {
+    dbConnect()
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;
@@ -21,7 +23,7 @@ export const POST = async (req: Request) => {
     if (buffer.length === 0) {
       return NextResponse.json({ error: 'File is empty' }, { status: 400 });
     }
-    
+
     const streamUpload = () => {
       return new Promise<{ url: string }>((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(

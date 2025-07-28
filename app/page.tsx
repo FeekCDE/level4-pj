@@ -6,8 +6,10 @@ import Footer from "./components/Footer";
 import { getCurrentUser } from "@/authentication";
 import Room from "@/models/room.model";
 import { IRoom } from "@/models/room.model";
+import dbConnect from "@/dbConnect";
 
 async function getFeaturedRooms(): Promise<IRoom[]> {
+  dbConnect();
   return Room.find({ isFeatured: true }).limit(6).exec();
 }
 
