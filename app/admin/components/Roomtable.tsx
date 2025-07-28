@@ -14,7 +14,11 @@ export default function RoomTable({ rooms, setRooms }: RoomTableProps) {
   const [editData, setEditData] = useState<Partial<Room>>({});
 
   const handleEdit = (room: Room) => {
-    setEditingId(room._id);
+    if (typeof room._id === 'string') {
+      setEditingId(room._id);
+    } else {
+      setEditingId(null);
+    }
     setEditData({
       name: room.name,
       price: room.price,
@@ -116,7 +120,11 @@ export default function RoomTable({ rooms, setRooms }: RoomTableProps) {
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 {editingId === room._id ? (
                   <div className="flex space-x-2">
-                    <button onClick={() => handleUpdate(room._id)} className="text-green-600 hover:text-green-900">
+                    <button
+                      onClick={() => typeof room._id === 'string' ? handleUpdate(room._id) : undefined}
+                      className="text-green-600 hover:text-green-900"
+                      disabled={typeof room._id !== 'string'}
+                    >
                       <FiCheck size={18} />
                     </button>
                     <button onClick={() => setEditingId(null)} className="text-red-600 hover:text-red-900">
@@ -128,7 +136,11 @@ export default function RoomTable({ rooms, setRooms }: RoomTableProps) {
                     <button onClick={() => handleEdit(room)} className="text-amber-600 hover:text-amber-900">
                       <FiEdit size={18} />
                     </button>
-                    <button onClick={() => handleDelete(room._id)} className="text-red-600 hover:text-red-900">
+                    <button
+                      onClick={() => room._id ? handleDelete(room._id) : undefined}
+                      className="text-red-600 hover:text-red-900"
+                      disabled={!room._id}
+                    >
                       <FiTrash2 size={18} />
                     </button>
                   </div>

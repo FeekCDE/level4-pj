@@ -6,7 +6,7 @@ import { Room } from "@/types/room";
 interface AddRoomModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (room: Room) => Promise<void>;
+  onSave: (room: Omit<Room, "_id">) => Promise<void>; // ✅ updated to not expect _id
 }
 
 const defaultRoomData: Omit<Room, "_id"> = {
@@ -18,7 +18,7 @@ const defaultRoomData: Omit<Room, "_id"> = {
   amenities: [],
   roomSize: "",
   images: [],
-  status: "available"
+  status: "available",
 };
 
 export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalProps) {
@@ -28,13 +28,7 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
   const [formError, setFormError] = useState<string | null>(null);
 
   const amenitiesOptions: Room["amenities"][number][] = [
-    "WiFi",
-    "Pool",
-    "Gym",
-    "Breakfast",
-    "Air Conditioning",
-    "TV",
-    "Workspace",
+    "WiFi", "Pool", "Gym", "Breakfast", "Air Conditioning", "TV", "Workspace",
   ];
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,14 +47,11 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data?.error || "Image upload failed");
-      }
+      if (!res.ok) throw new Error(data?.error || "Image upload failed");
 
       setRoomData((prev) => ({
         ...prev,
-        image: data.url,
+        images: [...(prev.images ?? []), data.url],
       }));
     } catch (err) {
       console.error("Image upload failed:", err);
@@ -73,13 +64,16 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setFormError(null); // clear previous error
+    setFormError(null);
+
+    if ((roomData.images?.length ?? 0) === 0) {
+      setFormError("Please upload at least one image.");
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      await onSave({
-        ...roomData,
-        _id: undefined
-      });
+      await onSave(roomData);
       setRoomData(defaultRoomData);
       onClose();
     } catch (error: any) {
@@ -204,9 +198,9 @@ export default function AddRoomModal({ isOpen, onClose, onSave }: AddRoomModalPr
                 className="w-full px-4 py-2 border border-amber-300 rounded-lg"
               />
               {uploadingImage && <p className="text-xs text-gray-500 mt-1">Uploading...</p>}
-              {roomData.images && (
+              {((roomData.images?.length ?? 0) > 0) && (
                 <img
-                  src={roomData.images[0]}
+                  src={roomData.images?.[0] || ""}
                   alt="Preview"
                   className="mt-2 w-full h-40 object-cover rounded-lg"
                 />

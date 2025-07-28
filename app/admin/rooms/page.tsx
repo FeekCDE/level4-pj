@@ -27,7 +27,7 @@ export default function ManageRooms() {
     fetchRooms();
   }, []);
 
- const handleAddRoom = async (room: Room) => {
+ const handleAddRoom = async (room: Omit<Room, "_id">) => {
   try {
     const res = await fetch('/api/rooms', {
       method: 'POST',
@@ -39,7 +39,6 @@ export default function ManageRooms() {
 
     if (!res.ok) throw new Error('Failed to create room');
 
-    const savedRoom = await res.json();
   } catch (err) {
     console.error('Create room error:', err);
   }

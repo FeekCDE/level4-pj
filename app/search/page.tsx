@@ -117,9 +117,9 @@ export default function BrowsePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {rooms.map((room) => (
                 <RoomCard
-                  key={room._id}
+                  key={String(room._id)}
                   room={room}
-                  onBookNow={() => handleBookNow(room._id)}
+                  onBookNow={() => room._id ? handleBookNow(String(room._id)) : undefined}
                   isLoggedIn={isLoggedIn}
                 />
               ))}
