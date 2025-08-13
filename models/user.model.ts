@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema<IUser>({
     match: [/^\S+@\S+\.\S+$/, "Please fill a valid email address"],
   },
   password: { type: String, required: [true, "Password is required"] },
-  role: { type: String, enum: ["user", "admin"], default: "user" },
+  role: { type: String, enum: ["user", "admin", "guest"], default: "user" },
 }, {
   timestamps: true,
 });

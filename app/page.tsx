@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 async function getFeaturedRooms(): Promise<IRoom[]> {
   await dbConnect(); 
-  return Room.find({ isFeatured: true }).limit(6).exec();
+  return Room.find({ isFeatured: true }).limit(6).lean().exec() as unknown as Promise<IRoom[]>;
 }
 
 export default async function Home() {
@@ -27,14 +27,6 @@ export default async function Home() {
       <section className="container mx-auto px-4 py-12 -mt-16 relative z-30 bg-white rounded-xl shadow-xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">Location</label>
-            <input
-              type="text"
-              placeholder="Where are you going?"
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-500"
-            />
-          </div>
-          <div className="space-y-1">
             <label className="text-sm font-medium text-gray-700">Check In</label>
             <input
               type="date"
@@ -49,9 +41,12 @@ export default async function Home() {
             />
           </div>
           <div className="flex items-end">
-            <button className="w-full bg-amber-600 hover:bg-amber-700 text-white p-3 rounded-lg font-medium transition-colors">
-              Search
-            </button>
+                <Link
+                  href={`/search`}
+                  className="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg font-medium transition-colors"
+                >
+                  Search
+                </Link>
           </div>
         </div>
       </section>
@@ -73,7 +68,8 @@ export default async function Home() {
                 <Image
                   src={room.images[0]}
                   alt={room.name}
-                  fill
+                  width={500}
+                  height={300}
                   className="object-cover"
                 />
               </div>
@@ -81,7 +77,7 @@ export default async function Home() {
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-xl font-semibold">{room.name}</h3>
                   <p className="text-lg font-bold text-amber-600">
-                    ₦{room.price}
+                    ${room.price}
                     <span className="text-sm font-normal text-gray-500">/night</span>
                   </p>
                 </div>
@@ -96,10 +92,10 @@ export default async function Home() {
                   ))}
                 </div>
                 <Link
-                  href={`/rooms/${room._id}`}
+                  href={`/bookings/${room._id}`}
                   className="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg font-medium transition-colors"
                 >
-                  View Details
+                  Book Now
                 </Link>
               </div>
             </div>
@@ -112,7 +108,7 @@ export default async function Home() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready for an unforgettable stay?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Sign up now to book your dream vacation with exclusive member benefits
+            Browse through our exclusive collection of luxury rooms and find your perfect escape.
           </p>
           <div className="flex justify-center gap-4">
             <Link

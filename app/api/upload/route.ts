@@ -9,40 +9,37 @@ cloudinary.config({
 });
 
 export const POST = async (req: Request) => {
-    dbConnect()
+  await dbConnect();
+
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    if (!file || typeof file === 'string') {
+      return NextResponse.json({ error: 'No file uploaded or invalid format' }, { status: 400 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    if (buffer.length === 0) {
+
+    if (!buffer || buffer.length === 0) {
       return NextResponse.json({ error: 'File is empty' }, { status: 400 });
     }
 
-    const streamUpload = () => {
-      return new Promise<{ url: string }>((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: 'hotel_rooms' },
-          (error, result) => {
-            if (error || !result) return reject(error);
-            resolve({ url: result.secure_url });
-          }
-        );
+    const uploadResult = await new Promise<{ url: string }>((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'hotel_rooms' },
+        (error, result) => {
+          if (error || !result) return reject(error || new Error('Upload failed'));
+          resolve({ url: result.secure_url });
+        }
+      );
+      stream.end(buffer);
+    });
 
-        stream.end(buffer);
-      });
-    };
-
-    const uploadResult = await streamUpload();
-
-    return NextResponse.json({ url: uploadResult.url });
+    return NextResponse.json({ success: true, url: uploadResult.url });
   } catch (error) {
     console.error('Upload failed:', error);
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Upload failed' }, { status: 500 });
   }
 };

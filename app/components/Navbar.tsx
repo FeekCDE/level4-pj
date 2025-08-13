@@ -30,7 +30,7 @@ export default function Navbar({ user }: NavbarProps) {
                 Dashboard
               </Link>
               <Link href="/bookings" className="hover:text-amber-600 transition">
-                My Bookings
+                Booking
               </Link>
               {user?.role === 'admin' && (
                 <Link href="/admin" className="hover:text-amber-600 transition">
@@ -47,7 +47,7 @@ export default function Navbar({ user }: NavbarProps) {
             <div className="flex items-center space-x-3">
               <span className="text-sm">Hi, {user.firstName}</span>
               {/* You could implement logout via a POST server action or redirect */}
-              <form action={handleLogOut} method="POST">
+              <form action={handleLogOut}>
                 <button
                   type="submit"
                   className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"

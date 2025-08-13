@@ -28,7 +28,7 @@ export default function RoomTable({ rooms, setRooms }: RoomTableProps) {
 
   const handleUpdate = async (id: string) => {
     try {
-      const res = await fetch(`/api/admin/rooms/${id}`, {
+      const res = await fetch(`/api/rooms/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editData),
@@ -36,9 +36,11 @@ export default function RoomTable({ rooms, setRooms }: RoomTableProps) {
 
       if (!res.ok) throw new Error("Failed to update room");
 
-      const updatedRoom: Room = await res.json();
-      setRooms(prev => prev.map(room => room._id === id ? updatedRoom : room));
+      await res.json();
       setEditingId(null);
+
+      // Smooth refresh without losing client state
+      window.location.reload();
     } catch (error) {
       console.error("Update failed:", error);
     }
@@ -46,8 +48,11 @@ export default function RoomTable({ rooms, setRooms }: RoomTableProps) {
 
   const handleDelete = async (id: string) => {
     try {
-      await fetch(`/api/admin/rooms/${id}`, { method: 'DELETE' });
+      await fetch(`/api/rooms/${id}`, { method: 'DELETE' });
       setRooms(prev => prev.filter(room => room._id !== id));
+
+      // Refresh to ensure server data is up to date
+      window.location.reload();
     } catch (error) {
       console.error("Delete failed:", error);
     }

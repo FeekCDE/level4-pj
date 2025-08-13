@@ -3,18 +3,17 @@ import dbConnect from '@/dbConnect';
 import Room from '@/models/room.model';
 import { NextResponse } from 'next/server';
 
+interface PriceRange {
+  $gte?: number;
+  $lte?: number;
+}
 
-interface RoomQuery {
+interface QueryParams {
   status?: string;
-  price?: {
-    $gte?: number;
-    $lte?: number;
-  };
+  price?: PriceRange;
 }
 
 
-
-// GET all rooms
 export async function GET(request: Request) {
   try {
     await dbConnect();
@@ -24,7 +23,7 @@ export async function GET(request: Request) {
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
 
-    const query: RoomQuery = {};
+    const query: QueryParams = {};
     if (status) query.status = status;
     if (minPrice || maxPrice) {
       query.price = {};
@@ -32,10 +31,14 @@ export async function GET(request: Request) {
       if (maxPrice) query.price.$lte = Number(maxPrice);
     }
 
-    const rooms = await Room.find(query);
-    return NextResponse.json({ success: true, data: rooms }, { status: 200 });
+    const rooms = await Room.find(query).lean();
+
+    return NextResponse.json(
+      { success: true, data: rooms },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error(error);
+    console.error('Failed to fetch rooms:', error);
     return NextResponse.json(
       { success: false, message: 'Failed to fetch rooms' },
       { status: 500 }

@@ -8,13 +8,13 @@ const Hero = () => {
         <section className="relative h-[600px]">
         <div className="absolute inset-0 bg-black/50 z-10" />
         <Image
-          src="/images/herobg.webp"
+          src="/images/entrance.jpg"
           alt="Luxury hotel"
           layout="fill"
           className="object-cover"
           priority
         />
-        <div className="container relative z-20 h-full flex flex-col justify-center items-center text-center text-white">
+        <div className="container relative z-20 h-full flex flex-col justify-center items-center text-center text-white mx-auto px-4">
           <h1 className="text-5xl font-bold mb-6">Find Your Perfect Escape</h1>
           <p className="text-xl mb-8 max-w-2xl">
             Discover luxury accommodations tailored to your desires

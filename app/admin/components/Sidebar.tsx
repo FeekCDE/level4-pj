@@ -10,7 +10,7 @@ export default function AdminSidebar() {
     { href: '/admin', label: 'Dashboard', icon: '📊' },
     { href: '/admin/rooms', label: 'Manage Rooms', icon: '🛏️' },
     { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
-    { href: '/admin/guests', label: 'Guests', icon: '👥' },
+    // { href: '/admin/guests', label: 'Guests', icon: '👥' },
   ];
 
   return (

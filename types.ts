@@ -7,3 +7,4 @@ export interface Signup {
   createdAt?: Date;
   updatedAt?: Date;
 }
+

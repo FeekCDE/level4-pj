@@ -10,15 +10,14 @@ export default function ManageRooms() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const res = await fetch('/api/admin/rooms');
-        if (!res.ok) throw new Error('Failed to fetch rooms');
-        const data: Room[] = await res.json();
-        setRooms(data);
-      } catch (error) {
-        console.error('Error loading rooms:', error);
+        const res = await fetch("/api/rooms");
+        const data = await res.json();
+        setRooms(data.data);
+      } catch (err) {
+        console.error("Error fetching rooms:", err);
       } finally {
         setLoading(false);
       }
@@ -27,22 +26,24 @@ export default function ManageRooms() {
     fetchRooms();
   }, []);
 
- const handleAddRoom = async (room: Omit<Room, "_id">) => {
-  try {
-    const res = await fetch('/api/rooms', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(room),
-    });
+async function onSave(roomData: Omit<Room, "_id">) {
+  const res = await fetch('/api/rooms', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(roomData),
+  });
 
-    if (!res.ok) throw new Error('Failed to create room');
-
-  } catch (err) {
-    console.error('Create room error:', err);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData?.message || 'Failed to save room');
   }
-};
+
+  return res.json();
+}
+
 
   return (
     <div className="space-y-6">
@@ -65,7 +66,7 @@ export default function ManageRooms() {
       <AddRoomModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={handleAddRoom}
+        onSave={onSave}
       />
     </div>
   );
